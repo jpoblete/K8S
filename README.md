@@ -6,5 +6,5 @@ Work collection
   Otherwise, decoupling the containers would be feasible
   - To implement:
     - kubectl must be available
-    - Download both files to the same directory
+    - Download files from hive/base to the same directory
     - Execute: hiveCtl start
