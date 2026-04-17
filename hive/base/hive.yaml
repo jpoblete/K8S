@@ -260,6 +260,10 @@ status:
   loadBalancer: {}
 ---
 apiVersion: v1
+#
+# Since Docker Desktop does not provide for RWX PV's...
+# We have to wrap everything on one POD
+# 
 kind: Pod
 metadata:
   labels:
@@ -268,7 +272,10 @@ metadata:
   namespace: default
 spec:
   #
-  # Execute as: root
+  # Initially, execute as: root
+  # The base image is VERY minimal 
+  # On the ConfigMap some packages are installed 
+  # Then switch to: hive user to run Hive
   #
   securityContext:
     runAsUser: 0
