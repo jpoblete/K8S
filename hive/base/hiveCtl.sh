@@ -1,5 +1,13 @@
 #!/bin/bash
-
+#
+# Apache Hive 4.2.0 on Kubernetes
+# Author: j.martinez.poblete@gmail.com
+# Free to use but please provide propper credit
+#
+# This script provides to stop/restart Apache Hive on K8S
+# Note that PVC's dynamic PV provisioning are not touched
+# in a attempt to keep data
+#
 YAML=hive.yaml
 NAMESPACE=$(sed -n '/kind: Pod/,/namespace:/p' hive.yaml | awk '/namespace/ {print $2}')
 
