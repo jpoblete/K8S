@@ -6,7 +6,7 @@
 #
 # This script provides to stop/restart Apache Hive on K8S
 # Note that PVC's dynamic PV provisioning are not touched
-# in a attempt to keep data
+# after creation in a attempt to preserve data
 #
 YAML=hive.yaml
 NAMESPACE=$(sed -n '/kind: Pod/,/namespace:/p' hive.yaml | awk '/namespace/ {print $2}')
