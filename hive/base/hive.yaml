@@ -2,7 +2,7 @@
 #
 # Apache Hive 4.2.0 on Kubernetes
 # Author: j.martinez.poblete@gmail.com
-# Please provide credit if used 
+# Free to use but please provide propper credit 
 #
 apiVersion: v1
 kind: PersistentVolumeClaim
