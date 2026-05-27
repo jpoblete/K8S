@@ -8,6 +8,7 @@
 # Note that PVC's dynamic PV provisioning are not touched
 # after creation in a attempt to preserve data
 #
+source .functions
 YAML=hive.yaml
 NAMESPACE=$(sed -n '/kind: Pod/,/namespace:/p' hive.yaml | awk '/namespace/ {print $2}')
 
