@@ -20,7 +20,8 @@ sed -n '/kind:/,/namespace:/p' ${YAML}         \
 | xargs -L1 kubectl 
 }
 
-function startHive(){ 
+function startHive(){
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.36/deploy/local-path-storage.yaml
 kubectl create -f ${YAML}
 }
 
