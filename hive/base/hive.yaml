@@ -4,6 +4,14 @@
 # Author: j.martinez.poblete@gmail.com
 # Free to use but please provide propper credit 
 #
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-path-retain
+provisioner: rancher.io/local-path
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -14,7 +22,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: standard-retain
+  storageClassName: local-path-retain
   resources:
     requests:
       storage: 1Gi
@@ -29,7 +37,7 @@ metadata:
 spec:
   accessModes:
    - ReadWriteOncePod
-  storageClassName: standard-retain
+  storageClassName: local-path-retain
   resources:
     requests:
       storage: 1Gi
@@ -44,7 +52,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteOncePod
-  storageClassName: standard-retain
+  storageClassName: local-path-retain
   resources:
     requests:
       storage: 1Gi
