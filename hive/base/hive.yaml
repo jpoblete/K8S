@@ -22,6 +22,7 @@ metadata:
   namespace: default
   labels:
     app: hive
+    hive: standalone
 spec:
   accessModes:
   - ReadWriteOnce
@@ -37,6 +38,7 @@ metadata:
   namespace: default
   labels:
     app: hive
+    hive: standalone
 spec:
   accessModes:
    - ReadWriteOncePod
@@ -52,6 +54,7 @@ metadata:
   namespace: default
   labels:
     app: hive
+    hive: standalone
 spec:
   accessModes:
   - ReadWriteOncePod
@@ -67,7 +70,7 @@ metadata:
   namespace: default
   labels:
     app: hive
-
+    hive: standalone
 data:
   core-site.xml: |
     <?xml version="1.0" encoding="UTF-8"?>
@@ -233,6 +236,7 @@ kind: Service
 metadata:
   labels:
     app: hive
+    hive: standalone
     component: hivemetastore
   name: hivemetastore
   namespace: default
@@ -253,6 +257,7 @@ kind: Service
 metadata:
   labels:
     app: hive
+    hive: standalone
     component: hiveserver2
   name: hiveserver2
   namespace: default
@@ -285,6 +290,7 @@ kind: Pod
 metadata:
   labels:
     app: hive
+    hive: standalone
   name: hive
   namespace: default
 spec:
