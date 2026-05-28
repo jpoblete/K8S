@@ -16,12 +16,12 @@
 #   Partitions  : 10
 #
 TIMESTAMP=$(date "+%s")
-TBL_TYPE=$1
-TBL_NAME=$2
-TBL_COLS=$3
-PRT_COUNT=$4
-ROW_PART=$5
-ITERATIONS=$6
+TBL_TYPE=$1    # Type: ext (external) / man (managed)
+TBL_NAME=$2    # Table name
+TBL_COLS=$3    # Number of columns
+PRT_COUNT=$4   # Partition level
+ROW_PART=$5    # Rows/ partition
+ITERATIONS=$6  # Total number of partitions - if Partition level >= 1
 
 usage(){
 echo "createTable.sh table_type table_name cols_number part_number rows iterations"
@@ -95,7 +95,7 @@ fi
 # Creating fake dataset per partition
 # Column Data per partition
 # First column is always INT
-# Next are random strings
+# Next are random 15 char strings
 #
 # RowData
 #
