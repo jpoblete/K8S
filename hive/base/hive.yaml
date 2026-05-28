@@ -186,13 +186,13 @@ data:
     #
     # START HIVE
     #
-    function startHive(){     
+    function startHive(){
        #
        # CORRECT ENV VARS
        #
        [ -z "${TEZ_HOME}"  ] && export TEZ_HOME=/opt/tez
        [ -z "${HIVE_HOME}" ] && export HIVE_HOME=/opt/hive && cd ${HIVE_HOME}
-       for i in $(env | awk '/_PORT/ && /=tcp:\/\// {gsub(/tcp:\/\/.*:/,"");print $0}'); do 
+       for i in $(env | awk '/_PORT/ && /=tcp:\/\// {gsub(/tcp:\/\/.*:/,"");print $0}'); do
            echo "Correcting: ${i}"
            export ${i}
        done
