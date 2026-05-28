@@ -219,7 +219,7 @@ data:
        #
        ls -lhtr ${HIVE_HOME}
        echo "Starting ${SERVICE^}"
-       ${HIVE_HOME}/bin/hive --service ${SERVICE} > ${LOG} 2>&1
+       ${HIVE_HOME}/bin/hive --service ${SERVICE} -hiveconf -Djava.net.preferIPv4Stack=true | tee -a ${LOG} 2>&1
        echo $?
        sleep 3600
     }
