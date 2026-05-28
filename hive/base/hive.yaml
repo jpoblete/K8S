@@ -170,7 +170,7 @@ data:
        echo "Staging ..."
        echo "root:root" | chpasswd
        echo "hive:hive" | chpasswd
-       microdnf -y install less vi lsof which net-tools bind-utils hostname netcat-openbsd
+       microdnf -y install less vi lsof which net-tools bind-utils hostname nmap-ncat
        cp ${HIVE_HOME}/setup/*.xml  ${HIVE_HOME}/conf/
        chown -R hive:hive ${HIVE_HOME}
        env
