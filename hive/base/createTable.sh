@@ -25,22 +25,21 @@ ITERATIONS=$6
 
 usage(){
 echo "createTable.sh table_type table_name cols_number part_number rows iterations"
-echo "table_type : ext, man"
-echo "table_name : choose a table name that does not exist already"
-echo "cols_number: number of columns"
-echo "part_number: number of nested partitions"
-echo "rows : rows per iteration"
-echo "iterations : number of batch inserts"
+echo "table_type  : ext, man - i.e external / managed"
+echo "table_name  : choose a table name that does not exist already"
+echo "cols_number : number of columns"
+echo "part_number : number of nested partitions"
+echo "rows        : rows per partition"
+echo "iterations  : number of partitions to be created"
 }
 
-
-[ -z "${TBL_TYPE}" ] && echo "ERROR: TBL_TYPE needs to be either 'man' or 'ext'" && usage && exit 1
-[ -z "${TBL_NAME}" ] && echo "ERROR: TBL_NAME needs to be specified" && usage && exit 1
-[ -z "${TBL_COLS}" ] && echo "INFO : TBL_COLS is undefined, defaulting to TBL_COLS=2" && TBL_COLS=2
-[ "${TBL_COLS}" -lt 2 ] && echo "ERROR: TBL_COLS=${TBL_COLS}, cannot be less than 2" && usage && exit 1
-[ -z "${PRT_COUNT}" ] && echo "INFO : PRT_COUNT is undefined, defaulting to PRT_COUNT=0" && PRT_COUNT=0
-[ -z "${ROW_PART}" ] && echo "INFO : ROW_PART is undefined, defaulting to ROW_PART=10" && ROW_PART=10
-[ -z "${ITERATIONS}" ] && echo "INFO : ITERATIONS is undefined, defaulting to ITERATIONS=10" && ITERATIONS=10
+[  -z "${TBL_TYPE}"    ] && echo "ERROR: table_type needs to be either 'man' or 'ext'"          && usage && exit 1
+[  -z "${TBL_NAME}"    ] && echo "ERROR: table_name needs to be specified"                      && usage && exit 1
+[  -z "${TBL_COLS}"    ] && echo "INFO : cols_number is undefined, defaulting to cols_number=2" && TBL_COLS=2
+[  "${TBL_COLS}" -lt 2 ] && echo "ERROR: cols_number=${TBL_COLS}, cannot be less than 2"        && usage && exit 1
+[  -z "${PRT_COUNT}"   ] && echo "INFO : part_number is undefined, defaulting to part_number=0" && PRT_COUNT=0
+[  -z "${ROW_PART}"    ] && echo "INFO : rows is undefined, defaulting to rows=10"              && ROW_PART=10
+[  -z "${ITERATIONS}"  ] && echo "INFO : iterations is undefined, defaulting to iteration=10"   && ITERATIONS=10
 
 
 createTbl(){
