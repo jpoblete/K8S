@@ -14,6 +14,9 @@
 #   Partitioning: 1 level
 #   Rows        : 10 per partition
 #   Partitions  : 10
+# IMPORTANT: Action takes place in this line:
+# beeline -f /tmp/createTable.${TIMESTAMP}.hql
+# Be sure to add your JDBC string as needed
 #
 TIMESTAMP=$(date "+%s")
 TBL_TYPE=$1    # Type: ext (external) / man (managed)
