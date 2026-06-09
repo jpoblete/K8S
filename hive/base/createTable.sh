@@ -66,7 +66,7 @@ createTbl(){
       STATEMENT="${STATEMENT}"
    fi
    STATEMENT="${STATEMENT} CLUSTERED BY (c1) SORTED BY (c1 ASC) INTO 128 BUCKETS;"
-   echo ${STATEMENT}
+   echo "${STATEMENT}"
 }
 genRandomStr() {
    local len=$1
@@ -127,7 +127,6 @@ genData(){
        #
        # PartitionData
        #
-       #echo ${STATEMENT}
        if [ "${PRT_COUNT}" -ge 1 ]; then
           STATEMENT="${STATEMENT},"
           #echo "iteration=${iteration}"
