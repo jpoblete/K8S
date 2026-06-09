@@ -44,7 +44,16 @@ echo "iterations  : number of partitions to be created"
 [  -z "${ROW_PART}"    ] && echo "INFO : rows is undefined, defaulting to rows=10"              && ROW_PART=10
 [  -z "${ITERATIONS}"  ] && echo "INFO : iterations is undefined, defaulting to iteration=10"   && ITERATIONS=10
 
-
+# Performance helper: Generates an alphanumeric string entirely in-memory
+genRandomStr() {
+    local len=$1
+    local s=""
+    local chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    while (( ${#s} < len )); do
+        s+="${chars:RANDOM%62:1}"
+    done
+    echo "$s"
+}
 createTbl(){
 STATEMENT="CREATE "
 [ "${TBL_TYPE}" == "ext" ] && STATEMENT="${STATEMENT} EXTERNAL"
@@ -108,7 +117,8 @@ iteration=0
 plist=()
 for r in $(seq 1 ${ROW_PART}); do
 vals="${r},"
-data=$(tr -dc A-Za-z0-9 </dev/urandom 2>/dev/null| head -c 15)
+#data=$(tr -dc A-Za-z0-9 </dev/urandom 2>/dev/null| head -c 15)
+data=$(genRandomStr 15)
 ((TBL_COLS--))
 for i in $(seq 2 ${TBL_COLS}); do
 vals="${vals} '${data}', "
@@ -135,7 +145,7 @@ fi
 for p in "${plist[@]}"; do
 STATEMENT="${STATEMENT} ${p}, "
 done
-STATEMENT=${STATEMENT::-2}
+STATEMENT="${STATEMENT::-2}"
 STATEMENT="${STATEMENT} ), ("
 #echo "Line 104"
 else
