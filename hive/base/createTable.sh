@@ -27,13 +27,13 @@ ROW_PART=$5    # Rows/ partition
 ITERATIONS=$6  # Total number of partitions - if Partition level >= 1
 
 usage(){
-echo "createTable.sh table_type table_name cols_number part_number rows iterations"
-echo "table_type  : ext, man - i.e external / managed"
-echo "table_name  : choose a table name that does not exist already"
-echo "cols_number : number of columns"
-echo "part_number : number of nested partitions"
-echo "rows        : rows per partition"
-echo "iterations  : number of partitions to be created"
+   echo "createTable.sh table_type table_name cols_number part_number rows iterations"
+   echo "table_type  : ext, man - i.e external / managed"
+   echo "table_name  : choose a table name that does not exist already"
+   echo "cols_number : number of columns"
+   echo "part_number : number of nested partitions"
+   echo "rows        : rows per partition"
+   echo "iterations  : number of partitions to be created"
 }
 
 [  -z "${TBL_TYPE}"    ] && echo "ERROR: table_type needs to be either 'man' or 'ext'"          && usage && exit 1
