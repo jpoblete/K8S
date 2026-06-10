@@ -10,40 +10,55 @@
 #
 source .functions
 YAML=hive.yaml
-NAMESPACE=$(sed -n '/kind: Pod/,/namespace:/p' hive.yaml | awk '/namespace/ {print $2}')
 
 function stopHive(){
-sed -n '/kind:/,/namespace:/p' ${YAML}         \
-| awk '/kind:|name:|namespace:/ {print $2}'    \
-| xargs -n3 | tr '[:upper:]' '[:lower:]'       \
-| awk '{print "delete -n "$3,$1,$2" --force"}' \
-| grep -v persistentvolumeclaim                \
-| xargs -L1 kubectl 
+   OPTS="--selector=hive"
+   OPTS="${OPTS} -o custom-columns=KIND:.kind,NAME:metadata.name,NAMESPACE:metadata.namespace"
+   OPTS="${OPTS} --no-headers"
+   kubectl get svc,cm,pods,sts ${OPTS}      \
+   | tr '[:upper:]' '[:lower:]'             \
+   | xargs -L1 kubectl 
 }
 
 function startHive(){
-kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.36/deploy/local-path-storage.yaml
-kubectl create -f ${YAML}
+   kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.36/deploy/local-path-storage.yaml
+   kubectl create -f ${YAML}
 }
 
 main(){
+  NAMESPACE=$(kubectl get pods -A  --selector=hive -o custom-columns=NAMESPACE:metadata.namespace --no-headers | sort -u)
   case $1 in
     logs)
-      LOG=$(kubectl logs -n default hive -c hivemetastore | awk -F= '/LOG=/ {print $2}') 
-      echo "HIVEMETASTORE:"
-      kubectl exec -n ${NAMESPACE} hive -c hivemetastore -it -- tail -25 ${LOG}
-      LOG=$(kubectl logs -n default hive -c hiveserver2   | awk -F= '/LOG=/ {print $2}') 
-      echo "HIVESERVER2:"
-      kubectl exec -n ${NAMESPACE} hive -c hiveserver2 -it -- tail -25 ${LOG}
+      if [ "${NAMESPACE}" ]; then
+         echo "HIVEMETASTORE:"
+         kubectl logs -n ${NAMESPACE} hive -c hivemetastore | tail -25
+         echo "HIVESERVER2:"
+         kubectl logs -n ${NAMESPACE} hive -c hiveserver2   | tail -25
+      else
+         echo "Hive is NOT running! Cannot produce logs"  
+      fi
       ;;
     start)
-      startHive
+      if [ -z "${NAMESPACE}" ]; then
+         echo "Starting Hive..."
+         startHive
+      else
+         echo "Hive is ALREADY running"
+      fi
       ;;
     status)
-      kubectl get pv,pvc,cm,svc,pods -n ${NAMESPACE} -o wide
+      if [ "${NAMESPACE}" ]; then
+         kubectl get pv,pvc,cm,svc,pods,sts -n ${NAMESPACE} -o wide
+      else
+         echo "Hive is STOPPED"
+      fi   
       ;;
     stop)
-      stopHive
+      if [ "${NAMESPACE}" ]; then
+         stopHive
+      else
+         echo "Hive is ALREADY stopped"
+      fi   
       ;;
   esac
 }
