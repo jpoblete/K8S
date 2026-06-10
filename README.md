@@ -6,9 +6,10 @@ Works collection
   Otherwise, decoupling the containers would be feasible
   - To implement:
     - kubectl must be available
-    - Download files from hive/base to the same directory
+      - User should have permissions to create/delete/list: pv,pvc,svcs,cm,sts
+    - Go to the hive/base directory
     - Execute: hiveCtl start
-Once installed, access beeline:
+  Once installed, access beeline:
 ```
 $ kubectl exec hive -c hiveserver2 -it -- /opt/hive/bin/beeline -u 'jdbc:hive2://localhost:10000/default' -n hive -p hive 
 ...
