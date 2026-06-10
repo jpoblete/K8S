@@ -1,4 +1,3 @@
-
 #
 # Apache Hive 4.2.0 on Kubernetes
 # Author: j.martinez.poblete@gmail.com
@@ -281,97 +280,110 @@ spec:
 status:
   loadBalancer: {}
 ---
-apiVersion: v1
-#
-# Since Docker Desktop does not provide for RWX PV's...
-# We have to wrap everything on one POD
-# 
-kind: Pod
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   labels:
     app: hive
-    hive: standalone
   name: hive
   namespace: default
 spec:
-  #
-  # Initially, execute as: root
-  # The base image is VERY minimal 
-  # On the ConfigMap some packages are installed 
-  # Then switch to: hive user to run Hive
-  #
-  securityContext:
-    runAsUser: 0
-    runAsGroup: 0
-    fsGroup: 0
-  containers:
-  #
-  # HMS
-  #
-  - name: hivemetastore
-    env:
-    - name: HIVE_VERSION
-      value: 4.2.0
-    - name: SERVICE_NAME
-      value: metastore
-    - name: HIVE_HOME
-      value: /opt/hive
-    - name: SERVICE
-      value: metastore
-    image: apache/hive:4.2.0
-    imagePullPolicy: IfNotPresent
-    command: ['/opt/hive/setup/staging.sh']
-    volumeMounts:
-    - name: mapconfig
-      mountPath: /opt/hive/setup
-    - name: derby
-      mountPath: /opt/hive/derby
-    - name: warehouse
-      mountPath: /opt/hive/data/warehouse
-    - name: logs
-      mountPath: /opt/hive/log
-    resources: {}
-  #
-  # HS2
-  #
-  - name: hiveserver2
-    env:
-    - name: HIVE_VERSION
-      value: 4.2.0
-    - name: SERVICE_NAME
-      value: hiveserver2
-    - name: HIVE_HOME
-      value: /opt/hive
-    - name: SERVICE
-      value: hiveserver2
-    image: apache/hive:4.2.0
-    imagePullPolicy: IfNotPresent
-    command: ['/opt/hive/setup/staging.sh']
-    volumeMounts:
-    - name: mapconfig
-      mountPath: /opt/hive/setup
-    - name: warehouse
-      mountPath: /opt/hive/data/warehouse
-    - name: logs
-      mountPath: /opt/hive/log
-    resources: {}
-  #
-  volumes:
-  - name: mapconfig
-    configMap:
-       name: hive
-       defaultMode: 0777
-  - name: derby
-    persistentVolumeClaim:
-      claimName: pvc-derby
-  - name: warehouse
-    persistentVolumeClaim:
-      claimName: pvc-warehouse
-  - name: logs
-    persistentVolumeClaim:
-      claimName: pvc-logs
-  dnsPolicy: ClusterFirst
-  restartPolicy: Always
+  progressDeadlineSeconds: 600
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hive
+  strategy:
+    rollingUpdate:
+      maxSurge: 33%
+      maxUnavailable: 33%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: hive
+    spec:
+      #
+      # Since Docker Desktop does not provide for RWX PV's...
+      # We have to wrap everything on one POD
+      # 
+      # Initially, execute as: root
+      # The base image is VERY minimal 
+      # On the ConfigMap some packages are installed 
+      # Then switch to: hive user to run Hive
+      #
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+      containers:
+      #
+      # HMS
+      #
+      - name: hivemetastore
+        env:
+        - name: HIVE_VERSION
+          value: 4.2.0
+        - name: SERVICE_NAME
+          value: metastore
+        - name: HIVE_HOME
+          value: /opt/hive
+        - name: SERVICE
+          value: metastore
+        image: apache/hive:4.2.0
+        imagePullPolicy: IfNotPresent
+        command: ['/opt/hive/setup/staging.sh']
+        volumeMounts:
+        - name: mapconfig
+          mountPath: /opt/hive/setup
+        - name: derby
+          mountPath: /opt/hive/derby
+        - name: warehouse
+          mountPath: /opt/hive/data/warehouse
+        - name: logs
+          mountPath: /opt/hive/log
+        resources: {}
+      #
+      # HS2
+      #
+      - name: hiveserver2
+        env:
+        - name: HIVE_VERSION
+          value: 4.2.0
+        - name: SERVICE_NAME
+          value: hiveserver2
+        - name: HIVE_HOME
+          value: /opt/hive
+        - name: SERVICE
+          value: hiveserver2
+        image: apache/hive:4.2.0
+        imagePullPolicy: IfNotPresent
+        command: ['/opt/hive/setup/staging.sh']
+        volumeMounts:
+        - name: mapconfig
+          mountPath: /opt/hive/setup
+        - name: warehouse
+          mountPath: /opt/hive/data/warehouse
+        - name: logs
+          mountPath: /opt/hive/log
+        resources: {}
+      #
+      volumes:
+      - name: mapconfig
+        configMap:
+          name: hive
+          defaultMode: 0777
+      - name: derby
+        persistentVolumeClaim:
+          claimName: pvc-derby
+      - name: warehouse
+        persistentVolumeClaim:
+          claimName: pvc-warehouse
+      - name: logs
+        persistentVolumeClaim:
+          claimName: pvc-logs
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
 status: {}
 #---
 #EOF
