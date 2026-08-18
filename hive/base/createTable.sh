@@ -69,7 +69,7 @@ createTbl(){
    if [ "${TBL_TYPE}" == "ice" ]; then
       STATEMENT="${STATEMENT} STORED BY ICEBERG STORED AS ORC"
    else
-      [ "${TBL_TYPE}" == "ext" ] STATEMENT="${STATEMENT} STORED AS ORC" 
+      [ "${TBL_TYPE}" == "ext" ] && STATEMENT="${STATEMENT} STORED AS ORC" 
    fi
    echo "${STATEMENT};"
 }
