@@ -67,9 +67,9 @@ createTbl(){
    fi   
    STATEMENT="${STATEMENT} CLUSTERED BY (c1) SORTED BY (c1 ASC) INTO 128 BUCKETS"
    if [ "${TBL_TYPE}" == "ice" ]; then
-      STATEMENT="${STATEMENT} STORED BY iceberg;"
+      STATEMENT="${STATEMENT} STORED BY ICEBERG STORED AS ORC;"
    else
-      STATEMENT="${STATEMENT};" 
+      STATEMENT="${STATEMENT} STORED AS ORC;" 
    fi
    echo "${STATEMENT}"
 }
