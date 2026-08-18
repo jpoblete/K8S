@@ -27,13 +27,13 @@ ROW_PART=$5    # Rows/ partition
 ITERATIONS=$6  # Total number of partitions - if Partition level >= 1
 
 usage(){
-   echo "createTable.sh table_type table_name cols_number part_number rows iterations"
+   echo "createTable.sh table_type table_name cols_number part_number rows partitions"
    echo "table_type  : ice, ext, man - i.e iceberg, external / managed"
    echo "table_name  : choose a table name that does not exist already"
    echo "cols_number : number of columns"
    echo "part_number : number of nested partitions"
    echo "rows        : rows per partition"
-   echo "iterations  : number of partitions to be created"
+   echo "partitions  : number of partitions to be created"
 }
 
 [  -z "${TBL_TYPE}"    ] && echo "ERROR: table_type needs to be either 'ice', 'man' or 'ext'"   && usage && exit 1
@@ -42,7 +42,7 @@ usage(){
 [  "${TBL_COLS}" -lt 2 ] && echo "ERROR: cols_number=${TBL_COLS}, cannot be less than 2"        && usage && exit 1
 [  -z "${PRT_COUNT}"   ] && echo "INFO : part_number is undefined, defaulting to part_number=0" && PRT_COUNT=0
 [  -z "${ROW_PART}"    ] && echo "INFO : rows is undefined, defaulting to rows=10"              && ROW_PART=10
-[  -z "${ITERATIONS}"  ] && echo "INFO : iterations is undefined, defaulting to iteration=10"   && ITERATIONS=10
+[  -z "${ITERATIONS}"  ] && echo "INFO : partitions is undefined, defaulting to iteration=10"   && ITERATIONS=10
 
 createTbl(){
    STATEMENT="CREATE "
@@ -162,7 +162,7 @@ genData(){
 }
 main(){
    createTbl
-   if [ "${ITERATIONS}" -gt 1 ]; then
+   if [ "${ITERATIONS}" -ge 1 ]; then
       for i in $(seq 1 ${ITERATIONS}); do
           genData
       done
