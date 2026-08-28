@@ -18,8 +18,9 @@
 # beeline -f /tmp/createTable.${TIMESTAMP}.hql
 # Be sure to add your JDBC string as needed
 #
+TYPES="ice_orc, ice_prq, orc, prq, txt - i.e iceberg orc/parquet, orc, parquet, txt (external) / orc managed"
 TIMESTAMP=$(date "+%s")
-TBL_TYPE=$1    # Type: ext (external) / man (managed)
+TBL_TYPE=$1    # Table type - see TYPES
 TBL_NAME=$2    # Table name
 TBL_COLS=$3    # Number of columns
 PRT_COUNT=$4   # Partition level
@@ -28,7 +29,7 @@ ITERATIONS=$6  # Total number of partitions - if Partition level >= 1
 
 usage(){
    echo "createTable.sh table_type table_name cols_number part_number rows partitions"
-   echo "table_type  : ice, ext, man - i.e iceberg, external / managed"
+   echo "table_type  : ${TYPES}"
    echo "table_name  : choose a table name that does not exist already"
    echo "cols_number : number of columns"
    echo "part_number : number of nested partitions"
@@ -36,7 +37,7 @@ usage(){
    echo "partitions  : number of partitions to be created"
 }
 
-[  -z "${TBL_TYPE}"    ] && echo "ERROR: table_type needs to be either 'ice', 'man' or 'ext'"   && usage && exit 1
+[  -z "${TBL_TYPE}"    ] && echo "ERROR: table_type needs to be either ${TYPES}"                && usage && exit 1
 [  -z "${TBL_NAME}"    ] && echo "ERROR: table_name needs to be specified"                      && usage && exit 1
 [  -z "${TBL_COLS}"    ] && echo "INFO : cols_number is undefined, defaulting to cols_number=2" && TBL_COLS=2
 [  "${TBL_COLS}" -lt 2 ] && echo "ERROR: cols_number=${TBL_COLS}, cannot be less than 2"        && usage && exit 1
@@ -46,7 +47,7 @@ usage(){
 
 createTbl(){
    STATEMENT="CREATE "
-   ([ "${TBL_TYPE}" == "ice" ] || [ "${TBL_TYPE}" == "ext" ]) && STATEMENT="${STATEMENT} EXTERNAL"
+   [ "${TBL_TYPE}" != "man" ] && STATEMENT="${STATEMENT} EXTERNAL"
    STATEMENT="${STATEMENT} TABLE IF NOT EXISTS ${TBL_NAME} ( c1 int,"
    ((TBL_COLS--))
    for i in $(seq 2 ${TBL_COLS}); do
@@ -66,11 +67,14 @@ createTbl(){
       STATEMENT="${STATEMENT}"
    fi   
    STATEMENT="${STATEMENT} CLUSTERED BY (c1) SORTED BY (c1 ASC) INTO 128 BUCKETS"
-   if [ "${TBL_TYPE}" == "ice" ]; then
-      STATEMENT="${STATEMENT} STORED BY ICEBERG STORED AS ORC"
-   else
-      [ "${TBL_TYPE}" == "ext" ] && STATEMENT="${STATEMENT} STORED AS ORC" 
-   fi
+   # ice_orc, ice_par, orc, par, txt, man
+   if [ "${TBL_TYPE}" != "man" ]; then
+      [ "${TBL_TYPE}" == "ice_orc" ] && STATEMENT="${STATEMENT} STORED BY ICEBERG STORED AS ORC"
+      [ "${TBL_TYPE}" == "ice_prq" ] && STATEMENT="${STATEMENT} STORED BY ICEBERG STORED AS PARQUET"
+      [ "${TBL_TYPE}" == "orc" ]     && STATEMENT="${STATEMENT} STORED AS ORC"
+      [ "${TBL_TYPE}" == "prq" ]     && STATEMENT="${STATEMENT} STORED AS PARQUET"
+      [ "${TBL_TYPE}" == "txt" ]     && STATEMENT="${STATEMENT} STORED AS TEXTFILE"
+   fi   
    echo "${STATEMENT};"
 }
 genRandomStr() {
