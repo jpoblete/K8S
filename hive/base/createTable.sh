@@ -16,6 +16,7 @@ ROW_PART="${5:-10}"
 ITERATIONS="${6:-10}"
 HQL_FILE="/tmp/createTable.${TIMESTAMP}.hql"
 
+# Print command usage and describe each positional argument.
 usage() {
    echo "createTable.sh table_type table_name cols_number part_number rows partitions"
    echo "table_type  : ${TYPES}"
@@ -26,20 +27,26 @@ usage() {
    echo "partitions  : number of insert batches/partitions, minimum 1"
 }
 
+# Print an error message, show usage, and stop the script.
 die() {
    echo "ERROR: $*" >&2
    usage >&2
    exit 1
 }
 
+# Return success when the provided value is an unsigned integer.
 is_uint() {
    [[ "$1" =~ ^[0-9]+$ ]]
 }
 
+# Validate a Hive table identifier.
+# Allows table_name or database.table_name format.
 validate_identifier() {
    [[ "$1" =~ ^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)?$ ]]
 }
 
+# Join all remaining arguments using the first argument as separator.
+# Used to build comma-separated SQL column/value lists safely.
 join_by() {
    local sep="$1"
    shift
@@ -58,6 +65,8 @@ join_by() {
    printf "%s" "${out}"
 }
 
+# Validate user input before generating SQL.
+# Checks table type, table name format, and numeric argument ranges.
 validate_args() {
    [ -n "${TBL_TYPE}" ] || die "table_type needs to be one of: ${TYPES}"
    [ -n "${TBL_NAME}" ] || die "table_name needs to be specified"
@@ -79,6 +88,25 @@ validate_args() {
    [ "${ITERATIONS}" -ge 1 ]  || die "partitions=${ITERATIONS}, cannot be less than 1"
 }
 
+# Generate a CREATE DATABASE statement when TBL_NAME uses database.table format.
+# Example: if TBL_NAME="sales.orders", this emits:
+# CREATE DATABASE IF NOT EXISTS sales;
+# If TBL_NAME has no database prefix, nothing is emitted.
+createDatabase() {
+   local db_name=""
+   case "${TBL_NAME}" in
+      *.*)
+         db_name="${TBL_NAME%%.*}"
+         printf "CREATE DATABASE IF NOT EXISTS %s;\n" "${db_name}"
+         ;;
+      *)
+         return 0
+         ;;
+   esac
+}
+
+# Generate the CREATE TABLE statement.
+# Chooses external/managed table behavior and storage format from TBL_TYPE.
 createTbl() {
    local create_prefix="CREATE"
    local storage_clause=""
@@ -140,6 +168,8 @@ createTbl() {
    printf ";\n"
 }
 
+# Generate a random alphanumeric string of the requested length.
+# Used as fake string data for generated table rows.
 genRandomStr() {
    local len="$1"
    local s=""
@@ -152,6 +182,8 @@ genRandomStr() {
    printf "%s" "${s}"
 }
 
+# Generate one INSERT statement with fake row data.
+# When partitioning is enabled, all rows in this batch share one partition tuple.
 genData() {
    local insert_cols=()
    local partition_values=()
@@ -195,10 +227,13 @@ genData() {
       "$(join_by ", " "${rows[@]}")"
 }
 
+# Main execution flow.
+# Validates arguments, creates the table statement, then generates insert batches.
 main() {
    local i
 
    validate_args
+   createDatabase
    createTbl
 
    for ((i=1; i<=ITERATIONS; i++)); do
