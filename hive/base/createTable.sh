@@ -6,9 +6,9 @@
 # * Grant execution: chmod +x ./createTable.sh
 # * Setup the kerberos environment - if applicable
 # * Execute the script - it will invoke beeline
-#   ./createTable.sh ext dummy_3_1 3 1 10 10
+#   ./createTable.sh txt dummy_3_1 3 1 10 10
 #   In this example, it will create...
-#   Type        : external
+#   Type        : EXTERNAL TEXTFILE
 #   Table       : dummy_3_1 
 #   Columns     : 3
 #   Partitioning: 1 level
