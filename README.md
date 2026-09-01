@@ -1,4 +1,4 @@
-# K8S
+# Hive on K8S
 Works collection
 - hive:
   Implements a demo of Hive running on a single POD.
